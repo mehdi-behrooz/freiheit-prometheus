@@ -54,6 +54,7 @@ services:
       - WEB_PASSWORD=123456
       - ALERT_DISK_USAGE=59
       - BLACKBOX_TARGETS="https://www.google.com, https://www.yahoo.com"
+#       - BLACKBOX_TARGETS=${BLACKBOX_TARGETS}
 
 volumes:
   test-prometheus-storage:

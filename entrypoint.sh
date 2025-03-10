@@ -54,7 +54,8 @@ jq '. + {targets: $t}' \
 blackbox_targets=$(
     echo "$BLACKBOX_TARGETS" \
         | tr -d '"' \
-        | tr ',;' ' ' \
+        | tr ',;\n' ' ' \
+        | awk '{$1=$1}1' \
         | jq -R '[splits("\\s+")]'
 )
 
