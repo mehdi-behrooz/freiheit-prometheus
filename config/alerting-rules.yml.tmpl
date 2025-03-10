@@ -1,0 +1,15 @@
+groups:
+
+{{- if .Env.ALERT_DISK_USAGE }}
+
+  - name: disk_alerts
+    rules:
+      - alert: HighDiskUsage
+        expr: (1 - (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"})) * 100 > {{ .Env.ALERT_DISK_USAGE }}
+        for: {{ .Env.ALERT_WAIT_TIME }}
+        annotations:
+          title: {{`"High Disk Usage on {{ $externalLabels.server }}"`}}
+          message: "Disk usage is above {{ .Env.ALERT_DISK_USAGE }}%!"
+
+{{- end }}
+

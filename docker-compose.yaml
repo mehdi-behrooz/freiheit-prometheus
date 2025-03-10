@@ -1,0 +1,59 @@
+services:
+  iadvisor:
+    image: ghcr.io/mehdi-behrooz/image-advisor:latest
+    container_name: test-iadvisor
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - prometheus.mode=scrape
+      - prometheus.port=8080 #autoguess
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: test-cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run/:/var/run/:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    labels:
+      - prometheus.host=host.docker.internal
+      - prometheus.mode=scrape
+      - prometheus.port=8080 #autoguess
+
+  blackbox-exporter:
+    image: prom/blackbox-exporter:latest
+    container_name: test-blackbox-exporter
+    labels:
+      - prometheus.mode=blackbox
+
+  alertmanager:
+    image: ghcr.io/mehdi-behrooz/freiheit-alertmanager:latest
+    container_name: test-alertmanager
+    restart: unless-stopped
+    environment:
+      - SMTP_HOST=example.com:587
+      - FROM=from@example.com
+      - TO=to@example.com
+    labels:
+      - prometheus.mode=alertmanager
+      - prometheus.port=9093
+
+  freiheit-prometheus:
+    build: .
+    container_name: test-freiheit-prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - test-prometheus-storage:/prometheus
+    environment:
+      - SERVER_NAME=MY_SERVER
+      - WEB_USERNAME=admin
+      - WEB_PASSWORD=123456
+      - ALERT_DISK_USAGE=59
+      - BLACKBOX_TARGETS="https://www.google.com, https://www.yahoo.com"
+
+volumes:
+  test-prometheus-storage:

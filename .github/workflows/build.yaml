@@ -1,0 +1,13 @@
+name: Build and Push Image to Github Repository
+
+on:
+  push:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    name: Build
+    uses: mehdi-behrooz/freiheit-workflows/.github/workflows/build.yaml@main
